@@ -15,21 +15,20 @@ RUN apt-get update \
         libpng12-dev \
         libmcrypt4 \
         libmcrypt-dev \
+        libcurl4-openssl-dev \
+        libxml2-dev \
+        curl \
+        vim \
         git \
         wget \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install opcache mcrypt intl pdo_mysql zip gd exif \
+    && docker-php-ext-install opcache curl mbstring dom mcrypt intl pdo_mysql zip gd exif \
     && pecl install xdebug \
     && pecl install apc \
     && curl -sS https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin \
-    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
-    && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-    && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
-    && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true \
+    && php -r "readfile('https://s3.amazonaws.com/files.drush.org/drush.phar');" > drush && mv drush /usr/local/bin && chmod +x /usr/local/bin/drush \
+    && curl -sS https://platform.sh/cli/installer | php \
+    && echo "source /root/.profile" > /root/.bashrc \
     && wget https://github.com/jwilder/dockerize/releases/download/v0.2.0/dockerize-linux-amd64-v0.2.0.tar.gz \
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz \
     && rm dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz \
